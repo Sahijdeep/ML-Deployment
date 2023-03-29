@@ -1,38 +1,4 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.cluster import KMeans
-import plotly.express as px
-from plotly.offline import init_notebook_mode, iplot
-import seaborn as sns
-
-import numpy as np
-import streamlit as st
-import pandas as pd
-from sklearn import datasets
-from sklearn.ensemble import RandomForestClassifier
-
-from sklearn.decomposition import PCA
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score, recall_score, f1_score
-
-import pickle 
-
-import warnings
-warnings.filterwarnings('ignore')
-
-st.write(''' # Academic Success Prediction App''')
-
-st.sidebar.header('User Input Parameters')
-
-import numpy as np
 
 import pandas as pd
 import matplotlib.pyplot as plt
