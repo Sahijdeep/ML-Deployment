@@ -32,24 +32,59 @@ st.write(''' # Academic Success Prediction App''')
 
 st.sidebar.header('User Input Parameters')
 
+import numpy as np
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans
+import plotly.express as px
+from plotly.offline import init_notebook_mode, iplot
+import seaborn as sns
+
+import numpy as np
+import streamlit as st
+import pandas as pd
+from sklearn import datasets
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.decomposition import PCA
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+import pickle 
+
+import warnings
+warnings.filterwarnings('ignore')
+
+st.write(''' # Academic Success Prediction App''')
+
+st.sidebar.header('User Input Parameters')
+
 def user_input_features():
-  Nationality = st.sidebar.slider('Nationality', 4.3, 7.9, 5.4)
-  Displaced  = st.sidebar.slider('Displaced', 2.0, 4.4, 3.4)
-  Tuition fees up to date = st.sidebar.slider('Tuition fees up to date', 1.0, 6.9, 1.3)
-  Scholarship holder = st.sidebar.slider('Scholarship holder', 0.1, 2.5, 0.2)
-  Curricular units 1st sem (approved)=st.sidebar.slider('Curricular units 1st sem (approved)', 4.3, 7.9, 5.4)
-  Curricular units 1st sem (grade)=st.sidebar.slider('Curricular units 1st sem (grade)', 4.3, 7.9, 5.4)
-  Curricular units 2nd sem (approved)=st.sidebar.slider('Curricular units 2nd sem (approved)', 4.3, 7.9, 5.4)
-  Curricular units 2nd sem (grade)=st.sidebar.slider('Curricular units 2nd sem (grade)', 4.3, 7.9, 5.4)
+  Nationality = st.sidebar.slider('Nationality', 1,21,10)
+  Displaced  = st.sidebar.slider('Displaced', 0, 1)
+  Tuition_fees_up_to_date= st.sidebar.slider('Tuition fees up to date', 0, 1)
+  Scholarship_holder = st.sidebar.slider('Scholarship holder', 0, 1)
+  Curricular_units_1st_sem_approved=st.sidebar.slider('Curricular units 1st sem (approved)', 0,26,13)
+  Curricular_units_1st_sem_grade=st.sidebar.slider('Curricular units 1st sem (grade)', 0,20,10)
+  Curricular_units_2nd_sem_approved=st.sidebar.slider('Curricular units 2nd sem (approved)', 0,26,13)
+  Curricular_units_2nd_sem_grade=st.sidebar.slider('Curricular units 2nd sem (grade)', 0,20,10)
 
   user_input_data = {'Nationality': Nationality,
-               'Displaced': Displaced,
-               'Tuition fees up to date': Tuition fees up to date,
-               'Scholarship holder': petal_width,
-               'Curricular units 1st sem (approved)'=Curricular units 1st sem (approved),
-               'Curricular units 1st sem (grade)'=Curricular units 1st sem (grade),
-               'Curricular units 2nd sem (approved)'=Curricular units 2nd sem (approved),
-               'Curricular units 2nd sem (grade)'=Curricular units 2nd sem (grade)}
+                     'Displaced': Displaced,
+                     'Tuition fees up to date': Tuition_fees_up_to_date,
+                     'Scholarship holder': Scholarship_holder,
+                     'Curricular units 1st sem (approved)':Curricular_units_1st_sem_approved,
+                     'Curricular units 1st sem (grade)':Curricular_units_1st_sem_grade,
+                     'Curricular units 2nd sem (approved)':Curricular_units_2nd_sem_approved,
+                     'Curricular units 2nd sem (grade)':Curricular_units_2nd_sem_grade}
 
   features = pd.DataFrame(user_input_data, index=[0])
 
@@ -74,11 +109,10 @@ student['Target'] = student['Target'].map({
 })
 student.describe()
 student.corr()['Target']
-fig = px.imshow(student)
-fig.show()
-student_df = student.iloc[:,[1,11,13,14,15,16,17,20,22,23,26,28,29,34]]
-sns.heatmap(student_df)
-student_df['Target'].value_counts()
+
+student_df=student.drop(columns=['Marital status','Application mode','Application order','Course','Daytime/evening attendance','Previous qualification',"Mother's qualification","Father's qualification","Mother's occupation","Father's occupation",'Educational special needs','Debtor','Age at enrollment','International','Curricular units 1st sem (credited)','Curricular units 1st sem (enrolled)','Curricular units 1st sem (evaluations)','Curricular units 1st sem (without evaluations)','Curricular units 2nd sem (credited)','Curricular units 2nd sem (enrolled)','Curricular units 2nd sem (evaluations)','Curricular units 2nd sem (without evaluations)','Unemployment rate','Inflation rate','GDP','Target'],axis=1)
+
+student_df = student.iloc[:,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34]]
 x = student_df['Target'].value_counts().index
 y = student_df['Target'].value_counts().values
 
@@ -87,24 +121,13 @@ df = pd.DataFrame({
     'Count_T' : y
 })
 
-fig = px.pie(df,
-             names ='Target', 
-             values ='Count_T',
-            title='How many dropouts, enrolled & graduates are there in Target column')
-
-fig.update_traces(labels=['Graduate','Dropout','Enrolled'], hole=0.4,textinfo='value+label', pull=[0,0.2,0.1])
-fig.show()
-fig = px.scatter(student_df, 
-             x = 'Curricular units 1st sem (approved)',
-             y = 'Curricular units 2nd sem (approved)',
-             color = 'Target')
-fig.show()
 X = student_df.iloc[:,0:13]
 y = student_df.iloc[:,-1]
 X
 X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
 
 from sklearn.ensemble import RandomForestClassifier
+
 
 clf = RandomForestClassifier(max_depth=10, random_state=0)
 
@@ -133,3 +156,15 @@ print("With CV: ",scores.mean())
 print("Precision Score: ", precision_score(y_test, y_pred,average='macro'))
 print("Recall Score: ", recall_score(y_test, y_pred,average='macro'))
 print("F1 Score: ", f1_score(y_test, y_pred,average='macro'))
+
+prediction = clf.predict(X_test)
+prediction_probabilities = clf.predict_proba(X_test)
+
+st.subheader('Prediction')
+st.write(prediction)
+
+st.subheader('Class labels and their corresponding index number')
+st.write(y)
+
+st.subheader('Prediction Probability')
+st.write(prediction_probabilities)
